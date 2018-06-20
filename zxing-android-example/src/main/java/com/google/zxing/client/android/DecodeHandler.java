@@ -75,10 +75,13 @@ final class DecodeHandler extends Handler {
   private void decode(byte[] data, int width, int height) {
     long start = System.currentTimeMillis();
     Result rawResult = null;
+    // 构造基于平面的YUV亮度源，即包含二维码区域的数据源
     PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
     if (source != null) {
+      // 构造比特流图像，使用HybridBinarizer算法解析数据源
       BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
       try {
+        // 采用MultiFormatReader解析图像，可以解析多种数据格式
         rawResult = multiFormatReader.decodeWithState(bitmap);
       } catch (ReaderException re) {
         // continue

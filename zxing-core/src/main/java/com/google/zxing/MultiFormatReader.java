@@ -100,7 +100,8 @@ public final class MultiFormatReader implements Reader {
     Collection<BarcodeFormat> formats =
         hints == null ? null : (Collection<BarcodeFormat>) hints.get(DecodeHintType.POSSIBLE_FORMATS);
     Collection<Reader> readers = new ArrayList<>();
-    if (formats != null) {
+    if (formats != null) {//含有DecodeHintType.POSSIBLE_FORMATS， 将包含如下在 DecodeThread 的构造函数中由 SP 配置的 BarcodeFormat
+      //是否添加 一维码 reader
       boolean addOneDReader =
           formats.contains(BarcodeFormat.UPC_A) ||
           formats.contains(BarcodeFormat.UPC_E) ||

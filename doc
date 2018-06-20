@@ -4,3 +4,71 @@ https://github.com/zxing/zxing
 将 android-core中的一个类(里面仅有一个，移动到 core-library)
 
 新建 application，导入 android(这是android 平台的示例工程) 中的源码和资源
+
+
+PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+    调用PreferenceManager.setDefaultValues()提前将默认值存储到sp中；
+    第三个参数，表示：是否重新将sp中的值还原成默认值
+
+class PreferencesFragment extends PreferenceFragment
+    addPreferencesFromResource(R.xml.preferences);
+    PreferenceScreen preferences = getPreferenceScreen();
+    //设置偏好改变后的监听
+    preferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+PlanarYUVLuminanceSource 基于平面的YUV亮度源
+DecodeHandler
+    #decode  解码处理
+    multiFormatReader.decodeWithState  多格式reader 来进行解码
+CameraManager#buildLuminanceSource  构建PlanarYUVLuminanceSource
+MultiFormatReader
+    setHints(Map<DecodeHintType,Object> hints)   设置配置，配置选项在枚举类DecodeHintType中
+        含有DecodeHintType.POSSIBLE_FORMATS， 将包含在 DecodeThread 的构造函数中由 SP 配置的 BarcodeFormat
+DecodeHintType
+    POSSIBLE_FORMATS(List.class)
+        接受一个集合类型，用于列举支持的解析格式，一共有17种，在com.google.zxing.BarcodeFormat 里定义。
+        官方默认支持所有的格式。在示例中可以在设置里，自行勾选
+    TRY_HARDER(Void.class)
+        花更多的时间试图找到一个条形码，优化的是准确性，而不是速度
+    CHARACTER_SET(String.class)
+        解析的字符集
+
+
+如果项目仅仅用来解析二维码，完全没必要支持所有的格式，也没有必要使用MultiFormatReader来解析。
+所以在配置的过程中，直接使用QRCodeReader类来解析，字符集采用utf-8，使用Harder模式，
+并且把可能的解析格式只定义为BarcodeFormat.QR_CODE，这对于直接二维码扫描解析无疑是帮助最大的。
+private final Map<DecodeHintType, Object> mHints;
+    DecodeHandler(QrCodeActivity activity) {
+     this.mActivity = activity;
+     mQrCodeReader = new QRCodeReader();
+     mHints = new Hashtable<>();
+     mHints.put(DecodeHintType.CHARACTER_SET, "utf-8");
+     mHints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+     mHints.put(DecodeHintType.POSSIBLE_FORMATS, BarcodeFormat.QR_CODE);
+}
+
+
+识别图片中的二维码
+    在安卓加载图片，一般是 argb_8888 或 rgb_565的位图格式
+    需要将 rgb转到 yuv420p ， 再给到 DecodeHandler#decode
+
+相机预览倍数设置及聚焦时间调整
+如果使用zxing默认的相机配置，会发现需要离二维码很近才能够识别出来，但这样会带来一个问题——聚焦困难。
+解决办法就是调整相机预览倍数以及减小相机聚焦的时间。
+AutoFocusManager
+    Camera.Parameters parameters = camera.getParameters();
+        String currentFocusMode = parameters.getFocusMode();
+        // 需要判断摄像头是否支持缩放
+        if (parameters.isZoomSupported()) {
+        // 设置成最大倍数的1/10，基本符合远近需求
+          parameters.setZoom(parameters.getMaxZoom() / 10);
+        }
+
+二维码扫描视觉的绘制在ViewfinderView.java完成
+
+
+
+参考：
+https://blog.csdn.net/xx326664162/article/details/50952856   Android ZXing 解析
+https://blog.csdn.net/qq_34317125/article/details/79639344   Android二维码的优化大法
+https://blog.csdn.net/u013278099/article/details/50734804    安卓的个性化彩色二维码的完美实现

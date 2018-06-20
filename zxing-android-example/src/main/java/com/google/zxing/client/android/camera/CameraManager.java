@@ -204,6 +204,7 @@ public final class CameraManager {
   }
 
   /**
+   * 计算并返回： 扫码框在屏幕中的矩形
    * Calculates the framing rect which the UI should draw to show the user where to place the
    * barcode. This target helps with alignment as well as forces the user to hold the device
    * far enough away to ensure the image will be in focus.
@@ -231,7 +232,15 @@ public final class CameraManager {
     }
     return framingRect;
   }
-  
+
+  /**
+   * 若屏幕分辨率的5/8，比传入最小参数小，使用传入最小参数； 比传入最大参数大，使用传入最大参数；
+   * 否则返回 屏幕分辨率的5/8
+   * @param resolution
+   * @param hardMin
+   * @param hardMax
+   * @return
+   */
   private static int findDesiredDimensionInRange(int resolution, int hardMin, int hardMax) {
     int dim = 5 * resolution / 8; // Target 5/8 of each dimension
     if (dim < hardMin) {
@@ -251,6 +260,7 @@ public final class CameraManager {
    */
   public synchronized Rect getFramingRectInPreview() {
     if (framingRectInPreview == null) {
+      //
       Rect framingRect = getFramingRect();
       if (framingRect == null) {
         return null;
@@ -319,13 +329,22 @@ public final class CameraManager {
    * @return A PlanarYUVLuminanceSource instance.
    */
   public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
-    Rect rect = getFramingRectInPreview();
+    // 取得预览框内的矩形
+   /* Rect rect = getFramingRectInPreview();
     if (rect == null) {
       return null;
     }
     // Go ahead and assume it's YUV rather than die.
     return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
-                                        rect.width(), rect.height(), false);
+                                        rect.width(), rect.height(), false);*/
+
+    /*
+     * 直接返回整幅图像的数据，而不计算聚焦框大小。
+     * 把解码数据换成采用全幅图像数据，这样在识别的过程中便不再拘束于聚焦框，也使得二维码数据可以铺满整个屏幕。
+     * 这样用户在使用程序来扫描二维码时，尽管不完全对准聚焦框，也可以识别出来
+     */
+    return new PlanarYUVLuminanceSource(data, width, height, 0, 0,
+            width, height, false);
   }
 
 }

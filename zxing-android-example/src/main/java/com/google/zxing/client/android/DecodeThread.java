@@ -66,6 +66,7 @@ final class DecodeThread extends Thread {
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
       decodeFormats = EnumSet.noneOf(BarcodeFormat.class);
       if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D_PRODUCT, true)) {
+        //添加一个 Set， DecodeFormatManager中的各 Set，表示一个大类别，内部则是该类别中的具体的 BarcodeFormat
         decodeFormats.addAll(DecodeFormatManager.PRODUCT_FORMATS);
       }
       if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D_INDUSTRIAL, true)) {

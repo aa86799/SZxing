@@ -249,7 +249,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       }
 
       characterSet = intent.getStringExtra(Intents.Scan.CHARACTER_SET);
-
     }
 
     SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);

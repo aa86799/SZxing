@@ -75,6 +75,9 @@ public final class PreferencesFragment
     disableLastCheckedPref();
   }
 
+  /**
+   * 设置只有一个选中状态时，其状态不可点击； 反之都可以点击
+   */
   private void disableLastCheckedPref() {
     Collection<CheckBoxPreference> checked = new ArrayList<>(checkBoxPrefs.length);
     for (CheckBoxPreference pref : checkBoxPrefs) {

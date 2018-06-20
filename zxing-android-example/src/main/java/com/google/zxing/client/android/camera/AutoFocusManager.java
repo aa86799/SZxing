@@ -34,7 +34,7 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
 
   private static final String TAG = AutoFocusManager.class.getSimpleName();
 
-  private static final long AUTO_FOCUS_INTERVAL_MS = 2000L;
+  private static final long AUTO_FOCUS_INTERVAL_MS = 1000L; //自动聚集的间隔时间，默认2000毫秒
   private static final Collection<String> FOCUS_MODES_CALLING_AF;
   static {
     FOCUS_MODES_CALLING_AF = new ArrayList<>(2);
@@ -51,7 +51,15 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
   AutoFocusManager(Context context, Camera camera) {
     this.camera = camera;
     SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-    String currentFocusMode = camera.getParameters().getFocusMode();
+
+    Camera.Parameters parameters = camera.getParameters();
+    // 需要判断摄像头是否支持缩放
+    if (parameters.isZoomSupported()) {
+    // 设置成最大倍数的1/10，基本符合远近需求
+      parameters.setZoom(parameters.getMaxZoom() / 10);
+    }
+
+    String currentFocusMode = parameters.getFocusMode();
     useAutoFocus =
         sharedPrefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true) &&
         FOCUS_MODES_CALLING_AF.contains(currentFocusMode);
