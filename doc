@@ -1,6 +1,6 @@
 https://github.com/zxing/zxing
 
-新建 library，导入 core 目录中的源码；
+新建 library，导入 core 目录中的源码； 也可以 『implementation 'com.google.zxing:core:3.3.0'』
 将 android-core中的一个类(里面仅有一个，移动到 core-library)
 
 新建 application，导入 android(这是android 平台的示例工程) 中的源码和资源
